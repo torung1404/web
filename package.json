@@ -1,12 +1,12 @@
 {
-  "name": "torunghub-pet-ws",
+  "name": "torunghub-web",
   "version": "1.0.0",
-  "description": "WebSocket server for sharing pets & jobIds between hubs",
+  "description": "ToRungHub WebSocket server + live viewer",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "ws": "^8.18.0"
+    "ws": "^8.16.0"
   }
 }
