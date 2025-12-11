@@ -9,87 +9,218 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #05070a;
-      color: #f5f5f5;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #02010a 100%);
+      color: #f9fafb;
     }
+    a { color: #60a5fa; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
     header {
       padding: 12px 20px;
-      background: #111827;
+      background: #020617ee;
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid #1f2933;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: conic-gradient(from 180deg, #22c55e, #0ea5e9, #6366f1, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(96,165,250,0.8);
+    }
+    .brand-logo span {
+      font-size: 16px;
+      font-weight: 800;
+      color: #020617;
     }
     header h1 {
       font-size: 18px;
       margin: 0;
     }
-    header span {
-      font-size: 12px;
+    header small {
       color: #9ca3af;
+      font-size: 11px;
+      display: block;
     }
+    nav {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    nav a {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      color: #e5e7eb;
+    }
+    nav a:hover {
+      background: #0f172a;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #fbbf24;
+    }
+    .status-dot.green { background: #22c55e; }
+    .status-dot.red { background: #f97373; }
+    .status-dot.gray { background: #6b7280; }
+
     main {
       padding: 16px 20px 24px;
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2.3fr 1.1fr;
+      gap: 16px;
+    }
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.7);
+      padding: 12px 14px 14px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+    .card-header small {
+      color: #9ca3af;
+      font-size: 11px;
     }
     .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       align-items: center;
     }
-    .controls input[type="text"] {
+    .controls input[type="text"],
+    .controls input[type="number"] {
       padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid #374151;
       background: #020617;
       color: #f9fafb;
-      font-size: 13px;
-      min-width: 220px;
+      font-size: 12px;
+      min-width: 170px;
     }
-    .controls input[readonly] { opacity: 0.85; }
-    .controls button {
+    .controls label {
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .controls input[type="checkbox"] {
+      accent-color: #22c55e;
+    }
+    button {
+      font-family: inherit;
+    }
+    .btn {
       padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid transparent;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
       background: #1d4ed8;
       color: #f9fafb;
       transition: background 0.15s ease, transform 0.05s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    .controls button:hover {
+    .btn:hover {
       background: #2563eb;
       transform: translateY(-1px);
     }
-    .controls button.secondary {
-      background: #111827;
+    .btn.secondary {
+      background: #020617;
       border-color: #374151;
+      color: #e5e7eb;
     }
-    .controls button.danger {
+    .btn.secondary:hover {
+      background: #111827;
+    }
+    .btn.danger {
       background: #b91c1c;
     }
-    .stats {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 8px;
+    .btn.danger:hover {
+      background: #ef4444;
     }
+    .btn-xs {
+      padding: 3px 7px;
+      font-size: 11px;
+      border-radius: 999px;
+    }
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .stats-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #020617;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
     }
-    thead { background: #0f172a; }
+    thead {
+      background: #0b1120;
+    }
     th, td {
-      padding: 8px 10px;
-      font-size: 13px;
+      padding: 6px 8px;
+      font-size: 12px;
       border-bottom: 1px solid #111827;
       text-align: left;
       vertical-align: top;
@@ -99,289 +230,405 @@
       color: #e5e7eb;
       white-space: nowrap;
     }
+    tbody tr:nth-child(even) {
+      background: #020617;
+    }
+    tbody tr:nth-child(odd) {
+      background: #020617;
+    }
     tbody tr:hover {
       background: #111827;
     }
+    td small {
+      color: #9ca3af;
+      font-size: 11px;
+    }
     .badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 2px 6px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 10px;
       background: #0f172a;
       color: #e5e7eb;
+      white-space: nowrap;
     }
     .badge.green { background: #064e3b; color: #a7f3d0; }
-    .badge.yellow { background: #92400e; color: #fbbf24; }
+    .badge.yellow { background: #92400e; color: #facc15; }
     .badge.purple { background: #4c1d95; color: #ddd6fe; }
-    .btn-sm {
-      padding: 3px 7px;
-      font-size: 11px;
-      border-radius: 6px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      background: #1f2937;
-      color: #e5e7eb;
-      margin-right: 4px;
-    }
-    .btn-sm:hover { background: #374151; }
-    .btn-sm.danger { background: #7f1d1d; }
-    .btn-sm.danger:hover { background: #b91c1c; }
+    .badge.gray { background: #111827; color: #9ca3af; }
+
     .details {
-      margin-top: 16px;
-      background: #020617;
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid #111827;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
-      max-height: 260px;
-      overflow: auto;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       white-space: pre-wrap;
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 8px;
+      background: #020617;
+      border: 1px solid #111827;
+      padding: 6px 8px;
     }
     .details-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
-      gap: 8px;
+      gap: 6px;
     }
     .details-header span {
-      font-size: 12px;
+      font-size: 11px;
       color: #9ca3af;
     }
-    code {
-      background: #111827;
-      padding: 2px 4px;
-      border-radius: 4px;
+    .details-header strong {
+      color: #e5e7eb;
+    }
+
+    .quick-section {
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .quick-section h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+    .snippet {
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      padding: 6px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .snippet code {
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    .snippet button {
+      flex-shrink: 0;
+    }
+    .small-muted {
+      font-size: 11px;
+      color: #9ca3af;
     }
     @media (max-width: 720px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      thead { display: none; }
-      tbody tr { margin-bottom: 8px; border-radius: 8px; overflow: hidden; }
-      td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        display: block;
-        margin-bottom: 2px;
-        color: #9ca3af;
-      }
+      main { padding: 10px 10px 16px; }
+      .card { padding: 10px; }
+      header { padding: 8px 10px; }
+      .snippet code { white-space: normal; }
     }
   </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>ToRungHub Live Viewer</h1>
-    <span>Xem data gửi từ Roblox (mobs / chests, jobId, placeId) qua WebSocket server.</span>
+  <div class="brand">
+    <div class="brand-logo"><span>T</span></div>
+    <div>
+      <h1>ToRungHub Live Viewer</h1>
+      <small>Real-time Roblox workspace scanner (mobs / chests / jobId / placeId)</small>
+    </div>
   </div>
-  <span id="statusDot" class="badge">WS: connecting…</span>
+  <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+    <nav>
+      <a href="https://github.com/torung1404/ToRungHub" target="_blank">GitHub</a>
+      <a href="https://discord.com/app" target="_blank">Discord</a>
+      <a href="#help">Help</a>
+    </nav>
+    <span id="statusBadge" class="status-badge">
+      <span id="statusDot" class="status-dot"></span>
+      <span id="statusText">WS: connecting…</span>
+    </span>
+  </div>
 </header>
 
 <main>
-  <div class="controls">
-    <input id="ws-url" type="text" readonly />
-    <input id="search" type="text" placeholder="Search player / jobId / text..." />
-    <button id="reconnectBtn">Reconnect</button>
-    <button id="clearBtn" class="secondary">Clear All</button>
-  </div>
-
-  <div class="stats" id="stats">0 sessions • last update: —</div>
-
-  <table>
-    <thead>
-    <tr>
-      <th>Player</th>
-      <th>Place / Job</th>
-      <th>Lines</th>
-      <th>Updated</th>
-      <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>
-
-  <div class="details" id="details" style="display:none;">
-    <div class="details-header">
-      <span id="details-title"></span>
-      <span id="details-extra"></span>
+  <!-- LEFT: Sessions table -->
+  <section class="card">
+    <div class="card-header">
+      <div>
+        <h2>Active servers / sessions</h2>
+        <small>List of all <code>pets_update</code> packets sent from Roblox scripts.</small>
+      </div>
+      <button id="btnReconnect" class="btn secondary">Reconnect WS</button>
     </div>
-    <div id="details-content"></div>
-  </div>
+
+    <div class="controls">
+      <input id="searchInput" type="text" placeholder="Search player / jobId / place / text..." />
+      <input id="filterPlaceInput" type="text" placeholder="Filter by placeId (optional)" />
+      <label>
+        Min lines:
+        <input id="minLinesInput" type="number" min="0" value="0" style="width:70px;" />
+      </label>
+      <label>
+        <input id="pinnedOnlyInput" type="checkbox" />
+        Pinned only
+      </label>
+      <button id="btnClear" class="btn secondary">Clear All</button>
+    </div>
+
+    <div class="stats-row">
+      <span class="stats-pill" id="statsSessions">0 sessions</span>
+      <span class="stats-pill" id="statsPlayers">0 players</span>
+      <span class="stats-pill" id="statsPlaces">0 places</span>
+      <span class="stats-pill" id="statsLastUpdate">last update: —</span>
+    </div>
+
+    <div style="overflow-x:auto; border-radius:8px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Place / Job</th>
+            <th>Lines</th>
+            <th>Age</th>
+            <th>Tags</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RIGHT: Details + Quick links -->
+  <aside>
+    <section class="card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <div>
+          <h2>Details</h2>
+          <small>Full mob/chest list of selected session.</small>
+        </div>
+        <span id="detailsMeta" class="small-muted">No session selected.</span>
+      </div>
+      <div id="detailsBox" class="details" style="display:none;"></div>
+      <div class="small-muted" id="detailsHint">Click “View” on any row to see full content.</div>
+    </section>
+
+    <section class="card" id="help">
+      <div class="card-header">
+        <div>
+          <h2>Quick snippets & links</h2>
+          <small>Copy-paste blocks for Roblox / sharing ToRungHub.</small>
+        </div>
+      </div>
+      <div class="quick-section">
+        <h3>Load ToRungHub (full)</h3>
+        <div class="snippet">
+          <code id="snippetFull">loadstring(game:HttpGet("https://raw.githubusercontent.com/torung1404/ToRungHub/main/loader.lua"))()</code>
+          <button class="btn btn-xs secondary" data-copy="snippetFull">Copy</button>
+        </div>
+
+        <h3>Load WS scanner + sender</h3>
+        <div class="snippet">
+          <code id="snippetSender">-- Sender script (Roblox) that scans workspace and sends to this server via WebSocket.</code>
+          <button class="btn btn-xs secondary" data-copy="snippetSender">Copy</button>
+        </div>
+
+        <h3>Current WebSocket URL</h3>
+        <div class="snippet">
+          <code id="snippetWsUrl"></code>
+          <button class="btn btn-xs secondary" data-copy="snippetWsUrl">Copy</button>
+        </div>
+
+        <p class="small-muted">
+          Tip: Share this page + loadstring to teammates. They can send their server info here, 
+          bạn chỉ cần copy <code>TeleportToPlaceInstance</code> snippet để nhảy qua server ngon.
+        </p>
+      </div>
+    </section>
+  </aside>
 </main>
 
 <script>
-  const origin = window.location.origin;        // https://web-production-252ee.up.railway.app
-  const defaultWsUrl = origin.replace(/^http/, "ws"); // wss://...
+  // ===== BASIC CONFIG =====
+  const origin = window.location.origin;
+  const defaultWsUrl = origin.replace(/^http/, "ws");
 
-  const wsUrlInput    = document.getElementById("ws-url");
-  const searchInput   = document.getElementById("search");
+  // DOM refs
   const statusDot     = document.getElementById("statusDot");
-  const statsEl       = document.getElementById("stats");
-  const tableBody     = document.getElementById("table-body");
-  const detailsEl     = document.getElementById("details");
-  const detailsTitle  = document.getElementById("details-title");
-  const detailsExtra  = document.getElementById("details-extra");
-  const detailsContent= document.getElementById("details-content");
+  const statusText    = document.getElementById("statusText");
+  const btnReconnect  = document.getElementById("btnReconnect");
+  const btnClear      = document.getElementById("btnClear");
+  const searchInput   = document.getElementById("searchInput");
+  const filterPlaceInput = document.getElementById("filterPlaceInput");
+  const minLinesInput = document.getElementById("minLinesInput");
+  const pinnedOnlyInput = document.getElementById("pinnedOnlyInput");
+  const tableBody     = document.getElementById("tableBody");
 
-  wsUrlInput.value = defaultWsUrl;
+  const statsSessions = document.getElementById("statsSessions");
+  const statsPlayers  = document.getElementById("statsPlayers");
+  const statsPlaces   = document.getElementById("statsPlaces");
+  const statsLastUpdate = document.getElementById("statsLastUpdate");
 
+  const detailsBox    = document.getElementById("detailsBox");
+  const detailsMeta   = document.getElementById("detailsMeta");
+  const detailsHint   = document.getElementById("detailsHint");
+
+  const snippetWsUrl  = document.getElementById("snippetWsUrl");
+  snippetWsUrl.textContent = defaultWsUrl;
+
+  // Copy buttons
+  document.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-copy");
+      const el = document.getElementById(id);
+      if (!el) return;
+      const text = el.textContent || "";
+      navigator.clipboard.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(() => btn.textContent = old, 800);
+      }).catch(() => {});
+    });
+  });
+
+  // ===== DATA MODEL =====
+  const records = new Map(); // key -> { player, placeId, jobId, pets[], ts, pinned, searchBlob }
   let socket = null;
-  const records = new Map();
   let lastUpdateTs = null;
   let currentDetailsKey = null;
 
-  function setStatus(text, cls) {
-    statusDot.textContent = "WS: " + text;
-    statusDot.className = "badge " + (cls || "");
+  function setStatus(state, label) {
+    statusText.textContent = "WS: " + label;
+    statusDot.className = "status-dot " + (
+      state === "connected" ? "green" :
+      state === "error" || state === "closed" ? "red" : "gray"
+    );
+  }
+
+  function formatRelative(ts) {
+    if (!ts) return "—";
+    const diff = Date.now() - ts;
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return s + "s ago";
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    return h + "h ago";
   }
 
   function connect() {
     if (socket) {
-      try { socket.close(); } catch(_) {}
+      try { socket.close(); } catch(e) {}
       socket = null;
     }
-
-    const url = wsUrlInput.value || defaultWsUrl;
-    setStatus("connecting…", "");
+    setStatus("connecting", "connecting…");
+    const url = defaultWsUrl;
     socket = new WebSocket(url);
 
     socket.onopen = () => {
-      console.log("[Viewer] WS open");
-      setStatus("connected", "green");
+      console.log("[Viewer] WebSocket open", url);
+      setStatus("connected", "connected");
     };
-
     socket.onclose = () => {
-      console.log("[Viewer] WS closed");
-      setStatus("closed", "");
+      console.log("[Viewer] WebSocket closed");
+      setStatus("closed", "closed");
     };
-
     socket.onerror = (err) => {
-      console.error("[Viewer] WS error", err);
-      setStatus("error", "yellow");
+      console.error("[Viewer] WebSocket error", err);
+      setStatus("error", "error");
     };
-
-    socket.onmessage = (ev) => {
+    socket.onmessage = (event) => {
       try {
-        const msg = JSON.parse(ev.data);
-        if (msg.type === "pets_update") handlePetsUpdate(msg);
+        const msg = JSON.parse(event.data);
+        if (msg.type === "pets_update") {
+          handlePetsUpdate(msg);
+        }
       } catch (e) {
-        console.error("[Viewer] parse error", e, ev.data);
+        console.error("[Viewer] parse error:", e, event.data);
       }
     };
   }
 
   function handlePetsUpdate(msg) {
     const key = (msg.jobId || "unknown") + "|" + (msg.player || "Unknown");
-    const rec = {
+    const ts = msg.ts || Date.now();
+    const existing = records.get(key);
+
+    // Anti-duplicate: ignore if this packet older than what we already have
+    if (existing && existing.ts && ts <= existing.ts) {
+      return;
+    }
+
+    const pets = Array.isArray(msg.pets) ? msg.pets : [];
+    const searchBlob = (msg.player + " " + msg.placeId + " " + msg.jobId + " " + pets.join(" ")).toLowerCase();
+
+    const record = {
       key,
       player: msg.player || "Unknown",
       placeId: msg.placeId || 0,
       jobId: msg.jobId || "unknown",
-      pets: Array.isArray(msg.pets) ? msg.pets : [],
-      ts: msg.ts || Date.now()
+      pets,
+      ts,
+      pinned: existing ? !!existing.pinned : false,
+      searchBlob
     };
-    records.set(key, rec);
+
+    records.set(key, record);
     lastUpdateTs = Date.now();
+
     renderTable();
-    if (currentDetailsKey === key) showDetails(key);
+    if (currentDetailsKey === key) {
+      showDetails(key);
+    }
   }
 
+  // ===== RENDERING =====
   function renderTable() {
     const q = (searchInput.value || "").toLowerCase();
+    const placeFilter = (filterPlaceInput.value || "").trim();
+    const minLines = parseInt(minLinesInput.value || "0", 10) || 0;
+    const pinnedOnly = pinnedOnlyInput.checked;
+
     tableBody.innerHTML = "";
 
-    const rows = Array.from(records.values()).sort((a,b) => b.ts - a.ts);
+    const rows = Array.from(records.values()).sort((a, b) => b.ts - a.ts);
+
+    const seenPlayers = new Set();
+    const seenPlaces  = new Set();
     let visible = 0;
 
     for (const rec of rows) {
-      const blob = (rec.player + " " + rec.jobId + " " + rec.placeId + " " + (rec.pets||[]).join(" ")).toLowerCase();
-      if (q && !blob.includes(q)) continue;
+      seenPlayers.add(rec.player);
+      seenPlaces.add(String(rec.placeId));
+
+      if (pinnedOnly && !rec.pinned) continue;
+      if (rec.pets.length < minLines) continue;
+      if (placeFilter && String(rec.placeId) !== placeFilter) continue;
+      if (q && rec.searchBlob.indexOf(q) === -1) continue;
+
       visible++;
 
       const tr = document.createElement("tr");
 
       const tdPlayer = document.createElement("td");
-      tdPlayer.dataset.label = "Player";
-      tdPlayer.innerHTML = `<strong>${rec.player}</strong>`;
+      tdPlayer.innerHTML =
+        `<strong>${rec.player}</strong>` +
+        (rec.pinned ? ` <span class="badge yellow">PINNED</span>` : "");
       tr.appendChild(tdPlayer);
 
       const tdJob = document.createElement("td");
-      tdJob.dataset.label = "Place / Job";
-      tdJob.innerHTML = `Place: <code>${rec.placeId}</code><br/>Job: <code>${rec.jobId}</code>`;
+      tdJob.innerHTML =
+        `Place: <code>${rec.placeId}</code><br>Job: <code>${rec.jobId}</code>`;
       tr.appendChild(tdJob);
 
       const tdLines = document.createElement("td");
-      tdLines.dataset.label = "Lines";
       tdLines.innerHTML = `<span class="badge purple">${rec.pets.length}</span>`;
       tr.appendChild(tdLines);
 
-      const tdTime = document.createElement("td");
-      tdTime.dataset.label = "Updated";
-      tdTime.innerHTML = `<small>${new Date(rec.ts).toLocaleTimeString()}</small>`;
-      tr.appendChild(tdTime);
+      const tdAge = document.createElement("td");
+      tdAge.innerHTML = `<small>${formatRelative(rec.ts)}</small>`;
+      tr.appendChild(tdAge);
 
-      const tdActions = document.createElement("td");
-      tdActions.dataset.label = "Actions";
-      const btnView = document.createElement("button");
-      btnView.className = "btn-sm";
-      btnView.textContent = "View";
-      btnView.onclick = () => showDetails(rec.key);
-
-      const btnCopy = document.createElement("button");
-      btnCopy.className = "btn-sm";
-      btnCopy.textContent = "Copy Teleport";
-      btnCopy.onclick = () => {
-        const snippet = `game:GetService("TeleportService"):TeleportToPlaceInstance(${rec.placeId}, "${rec.jobId}", game.Players.LocalPlayer)`;
-        navigator.clipboard.writeText(snippet).then(() => {
-          btnCopy.textContent = "Copied!";
-          setTimeout(() => btnCopy.textContent = "Copy Teleport", 800);
-        }).catch(() => {});
-      };
-
-      const btnDel = document.createElement("button");
-      btnDel.className = "btn-sm danger";
-      btnDel.textContent = "Delete";
-      btnDel.onclick = () => {
-        records.delete(rec.key);
-        if (currentDetailsKey === rec.key) hideDetails();
-        renderTable();
-      };
-
-      tdActions.appendChild(btnView);
-      tdActions.appendChild(btnCopy);
-      tdActions.appendChild(btnDel);
-      tr.appendChild(tdActions);
-
-      tableBody.appendChild(tr);
-    }
-
-    const total = records.size;
-    const last = lastUpdateTs ? new Date(lastUpdateTs).toLocaleTimeString() : "—";
-    statsEl.textContent = `${visible} sessions shown / ${total} total • last update: ${last}`;
-  }
-
-  function showDetails(key) {
-    const rec = records.get(key);
-    if (!rec) return;
-    currentDetailsKey = key;
-    detailsTitle.innerHTML = `<strong>${rec.player}</strong> • placeId=<code>${rec.placeId}</code> • jobId=<code>${rec.jobId}</code>`;
-    detailsExtra.textContent = `Updated: ${new Date(rec.ts).toLocaleString()} • Lines: ${rec.pets.length}`;
-    detailsContent.textContent = (rec.pets || []).join("\n");
-    detailsEl.style.display = "block";
-  }
-
-  function hideDetails() {
-    currentDetailsKey = null;
-    detailsEl.style.display = "none";
-  }
-
-  document.getElementById("reconnectBtn").onclick = connect;
-  document.getElementById("clearBtn").onclick = () => { records.clear(); hideDetails(); renderTable(); };
-  searchInput.addEventListener("input", renderTable);
-
-  connect();
-</script>
-</body>
-</html>
+      const tdTags = document.createElement("td");
+      const tags = [];
+      if (rec.pets.length === 0) {
+        tags.push(`<span class="badge gray">empty</span>`);
+      } else if (rec.pets.length > 100
