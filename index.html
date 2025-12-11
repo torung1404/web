@@ -1,0 +1,552 @@
+const server = http.createServer((req, res) => {
+  const url = req.url || "/";
+
+  if (req.method === "GET" && (url === "/" || url === "/index.html")) {
+    const filePath = path.join(__dirname, "index.html");
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.statusCode = 500;
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.end("Internal Server Error");
+        console.error("[ToRungHub-WS] Failed to read index.html:", err);
+        return;
+      }
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.end(data);
+    });
+  } else {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.end("Not Found");
+  }
+});
+
+// ---------- WebSocket SERVER ----------
+const wss = new WebSocket.Server({ server });
+
+console.log("[ToRungHub-WS] WebSocket server created.");
+
+const clients = new Set();
+
+function safeJsonParse(data) {
+  try {
+    return JSON.parse(data.toString());
+  } catch (e) {
+    return null;
+  }
+}
+
+wss.on("connection", (ws) => {
+  console.log("[ToRungHub-WS] Client connected");
+  clients.add(ws);
+
+  ws.on("message", (data) => {
+    const msg = safeJsonParse(data);
+    if (!msg || typeof msg !== "object") return;
+
+    if (msg.type === "pets_update") {
+      const payload = JSON.stringify({
+        type: "pets_update",
+        player: msg.player || "Unknown",
+        placeId: msg.placeId || 0,
+        jobId: msg.jobId || "unknown",
+        pets: Array.isArray(msg.pets) ? msg.pets : [],
+        ts: Date.now(),
+      });
+
+      // broadcast cho tất cả client khác
+      for (const client of clients) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(payload);
+        }
+      }
+
+      console.log(
+        "[ToRungHub-WS] pets_update from",
+        msg.player,
+        "jobId=" + msg.jobId,
+        "pets=" + (msg.pets ? msg.pets.length : 0)
+      );
+    }
+  });
+
+  ws.on("close", () => {
+    console.log("[ToRungHub-WS] Client disconnected");
+    clients.delete(ws);
+  });
+
+  ws.on("error", (err) => {
+    console.error("[ToRungHub-WS] Client error:", err);
+    clients.delete(ws);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log("[ToRungHub-WS] HTTP + WS listening on port", PORT);
+});
+
+
+// ======= index.html (tạo file mới ở root repo) =======
+/*
+  Web viewer đơn giản cho ToRungHub:
+  - Hiển thị các packet "pets_update" từ Roblox (mobs/chests scan).
+  - Tự connect WebSocket đến cùng domain (https → wss).
+*/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ToRungHub Live Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #05070a;
+      color: #f5f5f5;
+    }
+    header {
+      padding: 12px 20px;
+      background: #111827;
+      border-bottom: 1px solid #1f2933;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    header span {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    main {
+      padding: 16px 20px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .controls input[type="text"] {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 13px;
+      min-width: 220px;
+    }
+    .controls input[readonly] {
+      opacity: 0.85;
+    }
+    .controls button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      cursor: pointer;
+      background: #1d4ed8;
+      color: #f9fafb;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+    .controls button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    .controls button.secondary {
+      background: #111827;
+      border-color: #374151;
+    }
+    .controls button.danger {
+      background: #b91c1c;
+    }
+    .stats {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #020617;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+    }
+    thead {
+      background: #0f172a;
+    }
+    th, td {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-bottom: 1px solid #111827;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) {
+      background: #020617;
+    }
+    tbody tr:nth-child(odd) {
+      background: #020617;
+    }
+    tbody tr:hover {
+      background: #111827;
+    }
+    td small {
+      color: #9ca3af;
+      font-size: 11px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    .badge.green {
+      background: #064e3b;
+      color: #a7f3d0;
+    }
+    .badge.yellow {
+      background: #92400e;
+      color: #fbbf24;
+    }
+    .badge.purple {
+      background: #4c1d95;
+      color: #ddd6fe;
+    }
+    .btn-sm {
+      padding: 3px 7px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: #1f2937;
+      color: #e5e7eb;
+      margin-right: 4px;
+    }
+    .btn-sm:hover {
+      background: #374151;
+    }
+    .btn-sm.danger {
+      background: #7f1d1d;
+    }
+    .btn-sm.danger:hover {
+      background: #b91c1c;
+    }
+    .details {
+      margin-top: 16px;
+      background: #020617;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #111827;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+      max-height: 260px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+    .details-header span {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .details-header strong {
+      color: #e5e7eb;
+    }
+    code {
+      background: #111827;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    @media (max-width: 720px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tbody tr {
+        margin-bottom: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      td {
+        border-bottom: 1px solid #111827;
+      }
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: block;
+        margin-bottom: 2px;
+        color: #9ca3af;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>ToRungHub Live Viewer</h1>
+    <span>Xem data gửi từ Roblox (mobs / chests, jobId, placeId) qua WebSocket server.</span>
+  </div>
+  <span id="statusDot" class="badge">WS: connecting…</span>
+</header>
+
+<main>
+  <div class="controls">
+    <input id="ws-url" type="text" readonly />
+    <input id="search" type="text" placeholder="Search player / jobId / text..." />
+    <button id="reconnectBtn">Reconnect</button>
+    <button id="clearBtn" class="secondary">Clear All</button>
+  </div>
+
+  <div class="stats" id="stats">0 sessions • last update: —</div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Player</th>
+      <th>Place / Job</th>
+      <th>Lines</th>
+      <th>Updated</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+  </table>
+
+  <div class="details" id="details" style="display:none;">
+    <div class="details-header">
+      <span id="details-title"></span>
+      <span id="details-extra"></span>
+    </div>
+    <div id="details-content"></div>
+  </div>
+</main>
+
+<script>
+  // -------- CONFIG: build WS URL từ origin ----------
+  const origin = window.location.origin; // https://web-production-252ee.up.railway.app
+  const defaultWsUrl = origin.replace(/^http/, "ws"); // wss://...
+
+  const wsUrlInput = document.getElementById("ws-url");
+  const searchInput = document.getElementById("search");
+  const statusDot = document.getElementById("statusDot");
+  const statsEl = document.getElementById("stats");
+  const tableBody = document.getElementById("table-body");
+  const detailsEl = document.getElementById("details");
+  const detailsTitle = document.getElementById("details-title");
+  const detailsExtra = document.getElementById("details-extra");
+  const detailsContent = document.getElementById("details-content");
+
+  wsUrlInput.value = defaultWsUrl;
+
+  let socket = null;
+  const records = new Map(); // key -> record
+  let lastUpdateTs = null;
+  let currentDetailsKey = null;
+
+  function setStatus(text, colorClass) {
+    statusDot.textContent = "WS: " + text;
+    statusDot.className = "badge " + (colorClass || "");
+  }
+
+  function connect() {
+    if (socket) {
+      try { socket.close(); } catch (e) {}
+      socket = null;
+    }
+
+    const url = wsUrlInput.value || defaultWsUrl;
+    setStatus("connecting…", "");
+    console.log("[Viewer] Connecting to", url);
+    socket = new WebSocket(url);
+
+    socket.onopen = () => {
+      console.log("[Viewer] WebSocket open");
+      setStatus("connected", "green");
+    };
+
+    socket.onclose = () => {
+      console.log("[Viewer] WebSocket closed");
+      setStatus("closed", "");
+    };
+
+    socket.onerror = (err) => {
+      console.error("[Viewer] WebSocket error:", err);
+      setStatus("error", "yellow");
+    };
+
+    socket.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === "pets_update") {
+          handlePetsUpdate(msg);
+        } else {
+          console.log("[Viewer] Unknown message type:", msg);
+        }
+      } catch (e) {
+        console.error("[Viewer] parse error", e, ev.data);
+      }
+    };
+  }
+
+  function handlePetsUpdate(msg) {
+    const key = (msg.jobId || "unknown") + "|" + (msg.player || "Unknown");
+
+    const record = {
+      key,
+      player: msg.player || "Unknown",
+      placeId: msg.placeId || 0,
+      jobId: msg.jobId || "unknown",
+      pets: Array.isArray(msg.pets) ? msg.pets : [],
+      ts: msg.ts || Date.now()
+    };
+    records.set(key, record);
+    lastUpdateTs = Date.now();
+
+    renderTable();
+    if (currentDetailsKey === key) {
+      showDetails(key);
+    }
+  }
+
+  function renderTable() {
+    const query = (searchInput.value || "").toLowerCase();
+    tableBody.innerHTML = "";
+
+    const rows = Array.from(records.values()).sort((a, b) => b.ts - a.ts);
+    let visibleCount = 0;
+
+    for (const rec of rows) {
+      const blob = (rec.player + " " + rec.jobId + " " + rec.placeId + " " + (rec.pets || []).join(" ")).toLowerCase();
+      if (query && !blob.includes(query)) continue;
+
+      visibleCount++;
+
+      const tr = document.createElement("tr");
+
+      const tdPlayer = document.createElement("td");
+      tdPlayer.dataset.label = "Player";
+      tdPlayer.innerHTML = `<strong>${rec.player}</strong>`;
+      tr.appendChild(tdPlayer);
+
+      const tdJob = document.createElement("td");
+      tdJob.dataset.label = "Place / Job";
+      tdJob.innerHTML =
+        `<div>Place: <code>${rec.placeId}</code></div>` +
+        `<div>Job: <code>${rec.jobId}</code></div>`;
+      tr.appendChild(tdJob);
+
+      const tdLines = document.createElement("td");
+      tdLines.dataset.label = "Lines";
+      tdLines.innerHTML = `<span class="badge purple">${rec.pets.length}</span>`;
+      tr.appendChild(tdLines);
+
+      const tdTime = document.createElement("td");
+      tdTime.dataset.label = "Updated";
+      const d = new Date(rec.ts);
+      tdTime.innerHTML = `<small>${d.toLocaleTimeString()}</small>`;
+      tr.appendChild(tdTime);
+
+      const tdActions = document.createElement("td");
+      tdActions.dataset.label = "Actions";
+      const btnView = document.createElement("button");
+      btnView.className = "btn-sm";
+      btnView.textContent = "View";
+      btnView.onclick = () => showDetails(rec.key);
+
+      const btnCopy = document.createElement("button");
+      btnCopy.className = "btn-sm";
+      btnCopy.textContent = "Copy Teleport";
+      btnCopy.onclick = () => {
+        const snippet = `game:GetService("TeleportService"):TeleportToPlaceInstance(${rec.placeId}, "${rec.jobId}", game.Players.LocalPlayer)`;
+        navigator.clipboard.writeText(snippet).then(() => {
+          btnCopy.textContent = "Copied!";
+          setTimeout(() => (btnCopy.textContent = "Copy Teleport"), 800);
+        }).catch(() => {});
+      };
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "btn-sm danger";
+      btnDel.textContent = "Delete";
+      btnDel.onclick = () => {
+        records.delete(rec.key);
+        if (currentDetailsKey === rec.key) {
+          hideDetails();
+        }
+        renderTable();
+      };
+
+      tdActions.appendChild(btnView);
+      tdActions.appendChild(btnCopy);
+      tdActions.appendChild(btnDel);
+      tr.appendChild(tdActions);
+
+      tableBody.appendChild(tr);
+    }
+
+    const total = records.size;
+    const lastText = lastUpdateTs ? new Date(lastUpdateTs).toLocaleTimeString() : "—";
+    statsEl.textContent = `${visibleCount} sessions shown / ${total} total • last update: ${lastText}`;
+  }
+
+  function showDetails(key) {
+    const rec = records.get(key);
+    if (!rec) return;
+
+    currentDetailsKey = key;
+    const d = new Date(rec.ts);
+
+    detailsTitle.innerHTML = `<strong>${rec.player}</strong> • placeId=<code>${rec.placeId}</code> • jobId=<code>${rec.jobId}</code>`;
+    detailsExtra.textContent = `Updated: ${d.toLocaleString()} • Lines: ${rec.pets.length}`;
+    detailsContent.textContent = (rec.pets || []).join("\n");
+    detailsEl.style.display = "block";
+  }
+
+  function hideDetails() {
+    currentDetailsKey = null;
+    detailsEl.style.display = "none";
+  }
+
+  document.getElementById("reconnectBtn").addEventListener("click", () => {
+    connect();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    records.clear();
+    hideDetails();
+    renderTable();
+  });
+
+  searchInput.addEventListener("input", () => {
+    renderTable();
+  });
+
+  // Auto connect when page loads
+  connect();
+</script>
+</body>
+</html>
