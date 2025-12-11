@@ -1,98 +1,3 @@
-const server = http.createServer((req, res) => {
-  const url = req.url || "/";
-
-  if (req.method === "GET" && (url === "/" || url === "/index.html")) {
-    const filePath = path.join(__dirname, "index.html");
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.statusCode = 500;
-        res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        res.end("Internal Server Error");
-        console.error("[ToRungHub-WS] Failed to read index.html:", err);
-        return;
-      }
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.end(data);
-    });
-  } else {
-    res.statusCode = 404;
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.end("Not Found");
-  }
-});
-
-// ---------- WebSocket SERVER ----------
-const wss = new WebSocket.Server({ server });
-
-console.log("[ToRungHub-WS] WebSocket server created.");
-
-const clients = new Set();
-
-function safeJsonParse(data) {
-  try {
-    return JSON.parse(data.toString());
-  } catch (e) {
-    return null;
-  }
-}
-
-wss.on("connection", (ws) => {
-  console.log("[ToRungHub-WS] Client connected");
-  clients.add(ws);
-
-  ws.on("message", (data) => {
-    const msg = safeJsonParse(data);
-    if (!msg || typeof msg !== "object") return;
-
-    if (msg.type === "pets_update") {
-      const payload = JSON.stringify({
-        type: "pets_update",
-        player: msg.player || "Unknown",
-        placeId: msg.placeId || 0,
-        jobId: msg.jobId || "unknown",
-        pets: Array.isArray(msg.pets) ? msg.pets : [],
-        ts: Date.now(),
-      });
-
-      // broadcast cho tất cả client khác
-      for (const client of clients) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(payload);
-        }
-      }
-
-      console.log(
-        "[ToRungHub-WS] pets_update from",
-        msg.player,
-        "jobId=" + msg.jobId,
-        "pets=" + (msg.pets ? msg.pets.length : 0)
-      );
-    }
-  });
-
-  ws.on("close", () => {
-    console.log("[ToRungHub-WS] Client disconnected");
-    clients.delete(ws);
-  });
-
-  ws.on("error", (err) => {
-    console.error("[ToRungHub-WS] Client error:", err);
-    clients.delete(ws);
-  });
-});
-
-server.listen(PORT, () => {
-  console.log("[ToRungHub-WS] HTTP + WS listening on port", PORT);
-});
-
-
-// ======= index.html (tạo file mới ở root repo) =======
-/*
-  Web viewer đơn giản cho ToRungHub:
-  - Hiển thị các packet "pets_update" từ Roblox (mobs/chests scan).
-  - Tự connect WebSocket đến cùng domain (https → wss).
-*/
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,9 +51,7 @@ server.listen(PORT, () => {
       font-size: 13px;
       min-width: 220px;
     }
-    .controls input[readonly] {
-      opacity: 0.85;
-    }
+    .controls input[readonly] { opacity: 0.85; }
     .controls button {
       padding: 6px 10px;
       border-radius: 6px;
@@ -183,9 +86,7 @@ server.listen(PORT, () => {
       overflow: hidden;
       box-shadow: 0 12px 30px rgba(0,0,0,0.55);
     }
-    thead {
-      background: #0f172a;
-    }
+    thead { background: #0f172a; }
     th, td {
       padding: 8px 10px;
       font-size: 13px;
@@ -198,18 +99,8 @@ server.listen(PORT, () => {
       color: #e5e7eb;
       white-space: nowrap;
     }
-    tbody tr:nth-child(even) {
-      background: #020617;
-    }
-    tbody tr:nth-child(odd) {
-      background: #020617;
-    }
     tbody tr:hover {
       background: #111827;
-    }
-    td small {
-      color: #9ca3af;
-      font-size: 11px;
     }
     .badge {
       display: inline-block;
@@ -219,18 +110,9 @@ server.listen(PORT, () => {
       background: #0f172a;
       color: #e5e7eb;
     }
-    .badge.green {
-      background: #064e3b;
-      color: #a7f3d0;
-    }
-    .badge.yellow {
-      background: #92400e;
-      color: #fbbf24;
-    }
-    .badge.purple {
-      background: #4c1d95;
-      color: #ddd6fe;
-    }
+    .badge.green { background: #064e3b; color: #a7f3d0; }
+    .badge.yellow { background: #92400e; color: #fbbf24; }
+    .badge.purple { background: #4c1d95; color: #ddd6fe; }
     .btn-sm {
       padding: 3px 7px;
       font-size: 11px;
@@ -241,15 +123,9 @@ server.listen(PORT, () => {
       color: #e5e7eb;
       margin-right: 4px;
     }
-    .btn-sm:hover {
-      background: #374151;
-    }
-    .btn-sm.danger {
-      background: #7f1d1d;
-    }
-    .btn-sm.danger:hover {
-      background: #b91c1c;
-    }
+    .btn-sm:hover { background: #374151; }
+    .btn-sm.danger { background: #7f1d1d; }
+    .btn-sm.danger:hover { background: #b91c1c; }
     .details {
       margin-top: 16px;
       background: #020617;
@@ -274,9 +150,6 @@ server.listen(PORT, () => {
       font-size: 12px;
       color: #9ca3af;
     }
-    .details-header strong {
-      color: #e5e7eb;
-    }
     code {
       background: #111827;
       padding: 2px 4px;
@@ -286,14 +159,7 @@ server.listen(PORT, () => {
     @media (max-width: 720px) {
       table, thead, tbody, th, td, tr { display: block; }
       thead { display: none; }
-      tbody tr {
-        margin-bottom: 8px;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      td {
-        border-bottom: 1px solid #111827;
-      }
+      tbody tr { margin-bottom: 8px; border-radius: 8px; overflow: hidden; }
       td::before {
         content: attr(data-label);
         font-weight: 600;
@@ -333,8 +199,7 @@ server.listen(PORT, () => {
       <th>Actions</th>
     </tr>
     </thead>
-    <tbody id="table-body">
-    </tbody>
+    <tbody id="table-body"></tbody>
   </table>
 
   <div class="details" id="details" style="display:none;">
@@ -347,66 +212,60 @@ server.listen(PORT, () => {
 </main>
 
 <script>
-  // -------- CONFIG: build WS URL từ origin ----------
-  const origin = window.location.origin; // https://web-production-252ee.up.railway.app
+  const origin = window.location.origin;        // https://web-production-252ee.up.railway.app
   const defaultWsUrl = origin.replace(/^http/, "ws"); // wss://...
 
-  const wsUrlInput = document.getElementById("ws-url");
-  const searchInput = document.getElementById("search");
-  const statusDot = document.getElementById("statusDot");
-  const statsEl = document.getElementById("stats");
-  const tableBody = document.getElementById("table-body");
-  const detailsEl = document.getElementById("details");
-  const detailsTitle = document.getElementById("details-title");
-  const detailsExtra = document.getElementById("details-extra");
-  const detailsContent = document.getElementById("details-content");
+  const wsUrlInput    = document.getElementById("ws-url");
+  const searchInput   = document.getElementById("search");
+  const statusDot     = document.getElementById("statusDot");
+  const statsEl       = document.getElementById("stats");
+  const tableBody     = document.getElementById("table-body");
+  const detailsEl     = document.getElementById("details");
+  const detailsTitle  = document.getElementById("details-title");
+  const detailsExtra  = document.getElementById("details-extra");
+  const detailsContent= document.getElementById("details-content");
 
   wsUrlInput.value = defaultWsUrl;
 
   let socket = null;
-  const records = new Map(); // key -> record
+  const records = new Map();
   let lastUpdateTs = null;
   let currentDetailsKey = null;
 
-  function setStatus(text, colorClass) {
+  function setStatus(text, cls) {
     statusDot.textContent = "WS: " + text;
-    statusDot.className = "badge " + (colorClass || "");
+    statusDot.className = "badge " + (cls || "");
   }
 
   function connect() {
     if (socket) {
-      try { socket.close(); } catch (e) {}
+      try { socket.close(); } catch(_) {}
       socket = null;
     }
 
     const url = wsUrlInput.value || defaultWsUrl;
     setStatus("connecting…", "");
-    console.log("[Viewer] Connecting to", url);
     socket = new WebSocket(url);
 
     socket.onopen = () => {
-      console.log("[Viewer] WebSocket open");
+      console.log("[Viewer] WS open");
       setStatus("connected", "green");
     };
 
     socket.onclose = () => {
-      console.log("[Viewer] WebSocket closed");
+      console.log("[Viewer] WS closed");
       setStatus("closed", "");
     };
 
     socket.onerror = (err) => {
-      console.error("[Viewer] WebSocket error:", err);
+      console.error("[Viewer] WS error", err);
       setStatus("error", "yellow");
     };
 
     socket.onmessage = (ev) => {
       try {
         const msg = JSON.parse(ev.data);
-        if (msg.type === "pets_update") {
-          handlePetsUpdate(msg);
-        } else {
-          console.log("[Viewer] Unknown message type:", msg);
-        }
+        if (msg.type === "pets_update") handlePetsUpdate(msg);
       } catch (e) {
         console.error("[Viewer] parse error", e, ev.data);
       }
@@ -415,8 +274,7 @@ server.listen(PORT, () => {
 
   function handlePetsUpdate(msg) {
     const key = (msg.jobId || "unknown") + "|" + (msg.player || "Unknown");
-
-    const record = {
+    const rec = {
       key,
       player: msg.player || "Unknown",
       placeId: msg.placeId || 0,
@@ -424,27 +282,23 @@ server.listen(PORT, () => {
       pets: Array.isArray(msg.pets) ? msg.pets : [],
       ts: msg.ts || Date.now()
     };
-    records.set(key, record);
+    records.set(key, rec);
     lastUpdateTs = Date.now();
-
     renderTable();
-    if (currentDetailsKey === key) {
-      showDetails(key);
-    }
+    if (currentDetailsKey === key) showDetails(key);
   }
 
   function renderTable() {
-    const query = (searchInput.value || "").toLowerCase();
+    const q = (searchInput.value || "").toLowerCase();
     tableBody.innerHTML = "";
 
-    const rows = Array.from(records.values()).sort((a, b) => b.ts - a.ts);
-    let visibleCount = 0;
+    const rows = Array.from(records.values()).sort((a,b) => b.ts - a.ts);
+    let visible = 0;
 
     for (const rec of rows) {
-      const blob = (rec.player + " " + rec.jobId + " " + rec.placeId + " " + (rec.pets || []).join(" ")).toLowerCase();
-      if (query && !blob.includes(query)) continue;
-
-      visibleCount++;
+      const blob = (rec.player + " " + rec.jobId + " " + rec.placeId + " " + (rec.pets||[]).join(" ")).toLowerCase();
+      if (q && !blob.includes(q)) continue;
+      visible++;
 
       const tr = document.createElement("tr");
 
@@ -455,9 +309,7 @@ server.listen(PORT, () => {
 
       const tdJob = document.createElement("td");
       tdJob.dataset.label = "Place / Job";
-      tdJob.innerHTML =
-        `<div>Place: <code>${rec.placeId}</code></div>` +
-        `<div>Job: <code>${rec.jobId}</code></div>`;
+      tdJob.innerHTML = `Place: <code>${rec.placeId}</code><br/>Job: <code>${rec.jobId}</code>`;
       tr.appendChild(tdJob);
 
       const tdLines = document.createElement("td");
@@ -467,8 +319,7 @@ server.listen(PORT, () => {
 
       const tdTime = document.createElement("td");
       tdTime.dataset.label = "Updated";
-      const d = new Date(rec.ts);
-      tdTime.innerHTML = `<small>${d.toLocaleTimeString()}</small>`;
+      tdTime.innerHTML = `<small>${new Date(rec.ts).toLocaleTimeString()}</small>`;
       tr.appendChild(tdTime);
 
       const tdActions = document.createElement("td");
@@ -485,7 +336,7 @@ server.listen(PORT, () => {
         const snippet = `game:GetService("TeleportService"):TeleportToPlaceInstance(${rec.placeId}, "${rec.jobId}", game.Players.LocalPlayer)`;
         navigator.clipboard.writeText(snippet).then(() => {
           btnCopy.textContent = "Copied!";
-          setTimeout(() => (btnCopy.textContent = "Copy Teleport"), 800);
+          setTimeout(() => btnCopy.textContent = "Copy Teleport", 800);
         }).catch(() => {});
       };
 
@@ -494,9 +345,7 @@ server.listen(PORT, () => {
       btnDel.textContent = "Delete";
       btnDel.onclick = () => {
         records.delete(rec.key);
-        if (currentDetailsKey === rec.key) {
-          hideDetails();
-        }
+        if (currentDetailsKey === rec.key) hideDetails();
         renderTable();
       };
 
@@ -509,19 +358,16 @@ server.listen(PORT, () => {
     }
 
     const total = records.size;
-    const lastText = lastUpdateTs ? new Date(lastUpdateTs).toLocaleTimeString() : "—";
-    statsEl.textContent = `${visibleCount} sessions shown / ${total} total • last update: ${lastText}`;
+    const last = lastUpdateTs ? new Date(lastUpdateTs).toLocaleTimeString() : "—";
+    statsEl.textContent = `${visible} sessions shown / ${total} total • last update: ${last}`;
   }
 
   function showDetails(key) {
     const rec = records.get(key);
     if (!rec) return;
-
     currentDetailsKey = key;
-    const d = new Date(rec.ts);
-
     detailsTitle.innerHTML = `<strong>${rec.player}</strong> • placeId=<code>${rec.placeId}</code> • jobId=<code>${rec.jobId}</code>`;
-    detailsExtra.textContent = `Updated: ${d.toLocaleString()} • Lines: ${rec.pets.length}`;
+    detailsExtra.textContent = `Updated: ${new Date(rec.ts).toLocaleString()} • Lines: ${rec.pets.length}`;
     detailsContent.textContent = (rec.pets || []).join("\n");
     detailsEl.style.display = "block";
   }
@@ -531,21 +377,10 @@ server.listen(PORT, () => {
     detailsEl.style.display = "none";
   }
 
-  document.getElementById("reconnectBtn").addEventListener("click", () => {
-    connect();
-  });
+  document.getElementById("reconnectBtn").onclick = connect;
+  document.getElementById("clearBtn").onclick = () => { records.clear(); hideDetails(); renderTable(); };
+  searchInput.addEventListener("input", renderTable);
 
-  document.getElementById("clearBtn").addEventListener("click", () => {
-    records.clear();
-    hideDetails();
-    renderTable();
-  });
-
-  searchInput.addEventListener("input", () => {
-    renderTable();
-  });
-
-  // Auto connect when page loads
   connect();
 </script>
 </body>
