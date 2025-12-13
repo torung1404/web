@@ -1,0 +1,1199 @@
+<!-- file: index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ToRungHub Live Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #02010a 100%);
+      color: #f9fafb;
+    }
+    a { color: #60a5fa; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      padding: 12px 20px;
+      background: #020617ee;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #1f2933;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: conic-gradient(from 180deg, #22c55e, #0ea5e9, #6366f1, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(96,165,250,0.8);
+    }
+    .brand-logo span {
+      font-size: 16px;
+      font-weight: 800;
+      color: #020617;
+    }
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    header small {
+      color: #9ca3af;
+      font-size: 11px;
+      display: block;
+    }
+    nav {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    nav a {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      color: #e5e7eb;
+    }
+    nav a:hover { background: #0f172a; }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #fbbf24;
+    }
+    .status-dot.green { background: #22c55e; }
+    .status-dot.red { background: #f97373; }
+    .status-dot.gray { background: #6b7280; }
+
+    main {
+      padding: 16px 20px 24px;
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2.3fr 1.1fr;
+      gap: 16px;
+    }
+    @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.7);
+      padding: 12px 14px 14px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .card-header h2 { margin: 0; font-size: 15px; }
+    .card-header small { color: #9ca3af; font-size: 11px; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .controls input[type="text"],
+    .controls input[type="number"] {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 12px;
+      min-width: 170px;
+    }
+    .controls label {
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+    }
+    .controls input[type="checkbox"] { accent-color: #22c55e; }
+
+    button { font-family: inherit; }
+    .btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      cursor: pointer;
+      background: #1d4ed8;
+      color: #f9fafb;
+      transition: background 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+    }
+    .btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn[disabled] { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .btn.secondary {
+      background: #020617;
+      border-color: #374151;
+      color: #e5e7eb;
+    }
+    .btn.secondary:hover { background: #111827; }
+    .btn.danger { background: #b91c1c; }
+    .btn.danger:hover { background: #ef4444; }
+    .btn-xs {
+      padding: 3px 7px;
+      font-size: 11px;
+      border-radius: 999px;
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .stats-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      white-space: nowrap;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #0b1120; }
+    th, td {
+      padding: 6px 8px;
+      font-size: 12px;
+      border-bottom: 1px solid #111827;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even),
+    tbody tr:nth-child(odd) { background: #020617; }
+    tbody tr:hover { background: #111827; }
+    tbody tr.selected { outline: 1px solid #60a5fa; background: #0b1120; }
+    td small { color: #9ca3af; font-size: 11px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: #0f172a;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+    .badge.green { background: #064e3b; color: #a7f3d0; }
+    .badge.yellow { background: #92400e; color: #facc15; }
+    .badge.purple { background: #4c1d95; color: #ddd6fe; }
+    .badge.gray { background: #111827; color: #9ca3af; }
+
+    .details {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 8px;
+      background: #020617;
+      border: 1px solid #111827;
+      padding: 6px 8px;
+    }
+
+    .snippet {
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      padding: 6px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .snippet code {
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    .snippet button { flex-shrink: 0; }
+
+    .small-muted { font-size: 11px; color: #9ca3af; }
+
+    .toast {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid #111827;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #e5e7eb;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 50;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    @media (max-width: 720px) {
+      main { padding: 10px 10px 16px; }
+      .card { padding: 10px; }
+      header { padding: 8px 10px; }
+      .snippet code { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-logo"><span>T</span></div>
+    <div>
+      <h1>ToRungHub Live Viewer</h1>
+      <small>Real-time Roblox workspace scanner (mobs / chests / jobId / placeId)</small>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+    <nav>
+      <a href="https://github.com/torung1404/ToRungHub" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://discord.com/app" target="_blank" rel="noreferrer">Discord</a>
+      <a href="#help">Help</a>
+    </nav>
+    <span id="statusBadge" class="status-badge" aria-live="polite">
+      <span id="statusDot" class="status-dot"></span>
+      <span id="statusText">WS: connecting…</span>
+    </span>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <section class="card">
+    <div class="card-header">
+      <div>
+        <h2>Active servers / sessions</h2>
+        <small>List of all <code>pets_update</code> packets sent from Roblox scripts.</small>
+      </div>
+      <button id="btnReconnect" class="btn secondary">Reconnect WS</button>
+    </div>
+
+    <div class="controls">
+      <input id="searchInput" type="text" placeholder="Search player / jobId / place / text..." />
+      <input id="filterPlaceInput" type="text" placeholder="Filter by placeId (optional)" />
+      <label>
+        Min lines:
+        <input id="minLinesInput" type="number" min="0" value="0" style="width:70px;" />
+      </label>
+      <label>
+        <input id="pinnedOnlyInput" type="checkbox" />
+        Pinned only
+      </label>
+      <label>
+        <input id="freezeOrderInput" type="checkbox" />
+        Freeze order
+      </label>
+      <button id="btnClear" class="btn secondary">Clear All</button>
+    </div>
+
+    <div class="stats-row">
+      <span class="stats-pill" id="statsSessions">0 sessions</span>
+      <span class="stats-pill" id="statsPlayers">0 players</span>
+      <span class="stats-pill" id="statsPlaces">0 places</span>
+      <span class="stats-pill" id="statsVisible">0 visible</span>
+      <span class="stats-pill" id="statsLastPacket">last packet: —</span>
+      <span class="stats-pill" id="statsLastUpdate">last render: —</span>
+    </div>
+
+    <div style="overflow-x:auto; border-radius:8px;">
+      <table>
+        <thead>
+        <tr>
+          <th>Player</th>
+          <th>Place / Job</th>
+          <th>Lines</th>
+          <th>Age</th>
+          <th>Last seen</th>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RIGHT -->
+  <aside>
+    <section class="card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <div>
+          <h2>Details</h2>
+          <small>Full mob/chest list of selected session.</small>
+        </div>
+        <span id="detailsMeta" class="small-muted">No session selected.</span>
+      </div>
+      <div id="detailsBox" class="details" style="display:none;"></div>
+      <div class="small-muted" id="detailsHint">Click “View” on any row to see full content.</div>
+    </section>
+
+    <section class="card" id="help">
+      <div class="card-header">
+        <div>
+          <h2>Quick snippets & links</h2>
+          <small>Copy-paste blocks for Roblox / sharing ToRungHub.</small>
+        </div>
+      </div>
+      <div class="quick-section">
+        <h3>Load ToRungHub (full)</h3>
+        <div class="snippet">
+          <code id="snippetFull">loadstring(game:HttpGet("https://raw.githubusercontent.com/torung1404/ToRungHub/main/loader.lua"))()</code>
+          <button class="btn btn-xs secondary" data-copy="snippetFull">Copy</button>
+        </div>
+
+        <h3>Load WS scanner + sender</h3>
+        <div class="snippet">
+          <code id="snippetSender">loadstring(game:HttpGet("https://raw.githubusercontent.com/torung1404/ToRungHub/main/WorkspaceSender.lua"))()</code>
+          <button class="btn btn-xs secondary" data-copy="snippetSender">Copy</button>
+        </div>
+
+        <h3>Current WebSocket URL</h3>
+        <div class="snippet">
+          <code id="snippetWsUrl"></code>
+          <button class="btn btn-xs secondary" data-copy="snippetWsUrl">Copy</button>
+        </div>
+
+        <p class="small-muted">
+          Tip: Share this page + loadstring to teammates. Họ gửi server info lên đây,
+          bạn chỉ cần copy <code>TeleportToPlaceInstance</code> để nhảy server.
+        </p>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // ===== BASIC CONFIG =====
+  const origin = window.location.origin
+  const defaultWsUrl = origin.replace(/^http/, 'ws')
+
+  const MAX_RECORDS = 800
+  const MAX_PETS_STORED = 5000
+  const SEARCH_TEXT_MAX_CHARS = 6000
+  const RENDER_THROTTLE_MS = 150
+
+  const STORAGE_UI = 'torunghub.viewer.ui'
+  const STORAGE_PINNED = 'torunghub.viewer.pinnedKeys'
+
+  // DOM refs
+  const statusDot = document.getElementById('statusDot')
+  const statusText = document.getElementById('statusText')
+  const btnReconnect = document.getElementById('btnReconnect')
+  const btnClear = document.getElementById('btnClear')
+  const searchInput = document.getElementById('searchInput')
+  const filterPlaceInput = document.getElementById('filterPlaceInput')
+  const minLinesInput = document.getElementById('minLinesInput')
+  const pinnedOnlyInput = document.getElementById('pinnedOnlyInput')
+  const freezeOrderInput = document.getElementById('freezeOrderInput')
+  const tableBody = document.getElementById('tableBody')
+
+  const statsSessions = document.getElementById('statsSessions')
+  const statsPlayers = document.getElementById('statsPlayers')
+  const statsPlaces = document.getElementById('statsPlaces')
+  const statsVisible = document.getElementById('statsVisible')
+  const statsLastPacket = document.getElementById('statsLastPacket')
+  const statsLastUpdate = document.getElementById('statsLastUpdate')
+
+  const detailsBox = document.getElementById('detailsBox')
+  const detailsMeta = document.getElementById('detailsMeta')
+  const detailsHint = document.getElementById('detailsHint')
+
+  const snippetWsUrl = document.getElementById('snippetWsUrl')
+  const toastEl = document.getElementById('toast')
+
+  // ===== STATE =====
+  /** @type {Map<string, any>} */
+  const recordsByKey = new Map()
+  /** @type {Set<string>} */
+  const pinnedKeys = new Set(loadPinnedKeys())
+  let socket = null
+
+  let lastPacketAt = null
+  let lastRenderAt = null
+  let currentDetailsKey = null
+  let detailsDirty = false
+  let restoreScrollOnce = false
+
+  let renderTimer = null
+
+  let reconnectTimer = null
+  let retryCount = 0
+  let connectInFlight = false
+  let lastManualConnectAt = 0
+  let shouldReconnect = true
+
+  // Stable tie-break across renders (when not frozen)
+  let sortRankByKey = new Map()
+  let nextSeq = 0
+
+  // Freeze order ranks
+  let frozenRankByKey = null
+  let frozenNewSeq = 0
+
+  const wsUrl = resolveWsUrl()
+  snippetWsUrl.textContent = wsUrl
+
+  // ===== UTIL =====
+  function now() {
+    return Date.now()
+  }
+
+  function showToast(msg) {
+    toastEl.textContent = msg
+    toastEl.classList.add('show')
+    window.clearTimeout(showToast._t)
+    showToast._t = window.setTimeout(() => toastEl.classList.remove('show'), 900)
+  }
+
+  function safeString(value, maxLen) {
+    const s = value == null ? '' : String(value)
+    return s.length > maxLen ? s.slice(0, maxLen) : s
+  }
+
+  function safeInt(value, fallback) {
+    const n = Number(value)
+    return Number.isFinite(n) ? Math.trunc(n) : fallback
+  }
+
+  function normalizeTs(ts) {
+    const n = Number(ts)
+    if (!Number.isFinite(n)) return now()
+    // Heuristic: seconds -> ms
+    if (n > 0 && n < 2e10) return Math.trunc(n * 1000)
+    return Math.trunc(n)
+  }
+
+  function buildSearchText(player, placeId, jobId, pets) {
+    const base = (player + ' ' + placeId + ' ' + jobId + ' ').toLowerCase()
+    if (!pets || pets.length === 0) return base
+    let out = base
+    for (let i = 0; i < pets.length; i++) {
+      if (out.length >= SEARCH_TEXT_MAX_CHARS) break
+      const part = safeString(pets[i], 200).toLowerCase()
+      if (!part) continue
+      out += part + ' '
+    }
+    return out
+  }
+
+  function formatRelative(ts) {
+    if (!ts) return '—'
+    const diff = Math.max(0, now() - ts)
+    const s = Math.floor(diff / 1000)
+    if (s < 60) return s + 's ago'
+    const m = Math.floor(s / 60)
+    if (m < 60) return m + 'm ago'
+    const h = Math.floor(m / 60)
+    return h + 'h ago'
+  }
+
+  function formatClock(ts) {
+    if (!ts) return '—'
+    try {
+      return new Date(ts).toLocaleTimeString()
+    } catch (e) {
+      return '—'
+    }
+  }
+
+  function setStatus(state, label) {
+    statusText.textContent = 'WS: ' + label
+    let cls = 'status-dot gray'
+    if (state === 'connected') cls = 'status-dot green'
+    else if (state === 'error' || state === 'closed') cls = 'status-dot red'
+    statusDot.className = cls
+  }
+
+  async function copyToClipboard(text) {
+    const v = String(text || '')
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(v)
+        return true
+      }
+    } catch (e) {}
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = v
+      ta.style.position = 'fixed'
+      ta.style.top = '-1000px'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.focus()
+      ta.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+      return ok
+    } catch (e) {
+      return false
+    }
+  }
+
+  function flashButton(btn, ok) {
+    const old = btn.textContent
+    btn.textContent = ok ? 'Copied' : 'Copy failed'
+    window.setTimeout(() => { btn.textContent = old }, 900)
+  }
+
+  function readJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return fallback
+      return JSON.parse(raw)
+    } catch (e) {
+      return fallback
+    }
+  }
+
+  function writeJson(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+    } catch (e) {}
+  }
+
+  function loadPinnedKeys() {
+    const arr = readJson(STORAGE_PINNED, [])
+    if (!Array.isArray(arr)) return []
+    return arr.filter((x) => typeof x === 'string')
+  }
+
+  function persistPinnedKeys() {
+    writeJson(STORAGE_PINNED, Array.from(pinnedKeys).slice(0, 400))
+  }
+
+  function persistSelectedKeySoon() {
+    window.clearTimeout(persistSelectedKeySoon._t)
+    persistSelectedKeySoon._t = window.setTimeout(() => {
+      persistUiStateSoon(true)
+    }, 50)
+  }
+
+  function loadUiState() {
+    const state = readJson(STORAGE_UI, {})
+    if (!state || typeof state !== 'object') return
+    if (typeof state.filterPlace === 'string') filterPlaceInput.value = state.filterPlace
+    if (typeof state.minLines === 'number') minLinesInput.value = String(state.minLines)
+    if (typeof state.pinnedOnly === 'boolean') pinnedOnlyInput.checked = state.pinnedOnly
+    if (typeof state.freezeOrder === 'boolean') freezeOrderInput.checked = state.freezeOrder
+    if (typeof state.selectedKey === 'string' && state.selectedKey) {
+      currentDetailsKey = state.selectedKey
+      restoreScrollOnce = true
+    }
+  }
+
+  let persistUiTimer = null
+  function persistUiStateSoon(forceImmediate) {
+    window.clearTimeout(persistUiTimer)
+    const delay = forceImmediate ? 0 : 200
+    persistUiTimer = window.setTimeout(() => {
+      writeJson(STORAGE_UI, {
+        filterPlace: filterPlaceInput.value || '',
+        minLines: safeInt(minLinesInput.value, 0),
+        pinnedOnly: !!pinnedOnlyInput.checked,
+        freezeOrder: !!freezeOrderInput.checked,
+        selectedKey: currentDetailsKey || ''
+      })
+    }, delay)
+  }
+
+  function resolveWsUrl() {
+    const params = new URLSearchParams(window.location.search)
+    const raw = params.get('ws')
+    if (!raw) return defaultWsUrl
+    try {
+      const u = new URL(raw, window.location.href)
+      if (u.protocol !== 'ws:' && u.protocol !== 'wss:') return defaultWsUrl
+      return u.href
+    } catch (e) {
+      return defaultWsUrl
+    }
+  }
+
+  function scheduleRender() {
+    if (renderTimer != null) return
+    renderTimer = window.setTimeout(() => {
+      renderTimer = null
+      window.requestAnimationFrame(() => {
+        renderTable()
+        if (detailsDirty && currentDetailsKey) {
+          showDetails(currentDetailsKey)
+          detailsDirty = false
+        }
+      })
+    }, RENDER_THROTTLE_MS)
+  }
+
+  function enforceRecordCap() {
+    if (recordsByKey.size <= MAX_RECORDS) return
+    const overflow = recordsByKey.size - MAX_RECORDS
+    const arr = Array.from(recordsByKey.values())
+    arr.sort((a, b) => {
+      const pinDelta = (a.pinned ? 1 : 0) - (b.pinned ? 1 : 0) // unpinned first
+      if (pinDelta !== 0) return pinDelta
+      return (a.lastSeenAt || a.ts || 0) - (b.lastSeenAt || b.ts || 0) // oldest first
+    })
+    for (let i = 0; i < overflow; i++) {
+      const rec = arr[i]
+      if (!rec) break
+      recordsByKey.delete(rec.key)
+      if (currentDetailsKey === rec.key) clearDetails()
+      if (frozenRankByKey) frozenRankByKey.delete(rec.key)
+      sortRankByKey.delete(rec.key)
+    }
+  }
+
+  function clearDetails() {
+    currentDetailsKey = null
+    detailsDirty = false
+    detailsBox.style.display = 'none'
+    detailsBox.textContent = ''
+    detailsMeta.textContent = 'No session selected.'
+    detailsHint.style.display = 'block'
+    persistUiStateSoon(true)
+  }
+
+  function scrollRowIntoView(key, smooth) {
+    const row = tableBody.querySelector('tr[data-key="' + CSS.escape(key) + '"]')
+    if (!row) return
+    try {
+      row.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: smooth ? 'smooth' : 'auto' })
+    } catch (e) {
+      row.scrollIntoView()
+    }
+  }
+
+  function enableFreezeOrder() {
+    const arr = Array.from(recordsByKey.values())
+    // Use current normal comparator to capture a "good" snapshot order.
+    const prevRank = sortRankByKey
+    arr.sort((a, b) => {
+      const pinDelta = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)
+      if (pinDelta !== 0) return pinDelta
+      const t = (b.lastSeenAt || b.ts || 0) - (a.lastSeenAt || a.ts || 0)
+      if (t !== 0) return t
+      const ra = prevRank.get(a.key)
+      const rb = prevRank.get(b.key)
+      if (ra != null && rb != null) return ra - rb
+      return (a.seq || 0) - (b.seq || 0)
+    })
+    frozenRankByKey = new Map()
+    frozenNewSeq = 0
+    for (let i = 0; i < arr.length; i++) frozenRankByKey.set(arr[i].key, i)
+  }
+
+  function disableFreezeOrder() {
+    frozenRankByKey = null
+    frozenNewSeq = 0
+  }
+
+  // ===== WEBSOCKET =====
+  function cancelReconnectTimer() {
+    if (reconnectTimer != null) window.clearTimeout(reconnectTimer)
+    reconnectTimer = null
+  }
+
+  function computeReconnectDelayMs(attempt) {
+    const base = 350
+    const max = 12_000
+    const exp = Math.min(max, base * Math.pow(2, Math.min(attempt, 8)))
+    const jitter = Math.floor(Math.random() * 250)
+    return exp + jitter
+  }
+
+  function scheduleReconnect(reason) {
+    if (!shouldReconnect) return
+    if (reconnectTimer != null) return
+
+    retryCount += 1
+    const delay = computeReconnectDelayMs(retryCount)
+    setStatus('connecting', 'reconnecting… (#' + retryCount + ', ' + Math.ceil(delay / 1000) + 's)')
+
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = null
+      connectWs({ reason: reason || 'auto' })
+    }, delay)
+  }
+
+  function connectWs(opts) {
+    const manual = opts && opts.manual
+    const t = now()
+
+    if (connectInFlight) return
+    if (manual && t - lastManualConnectAt < 700) return
+    if (manual) lastManualConnectAt = t
+
+    cancelReconnectTimer()
+    connectInFlight = true
+
+    if (manual) retryCount = 0
+    setStatus('connecting', manual ? 'connecting… (manual)' : 'connecting…')
+
+    if (socket) {
+      try { socket.onopen = socket.onclose = socket.onerror = socket.onmessage = null } catch (e) {}
+      try { socket.close() } catch (e) {}
+      socket = null
+    }
+
+    try {
+      socket = new WebSocket(wsUrl)
+    } catch (e) {
+      connectInFlight = false
+      setStatus('error', 'create failed')
+      scheduleReconnect('create_failed')
+      return
+    }
+
+    socket.onopen = function () {
+      connectInFlight = false
+      retryCount = 0
+      setStatus('connected', 'connected')
+    }
+
+    socket.onclose = function () {
+      connectInFlight = false
+      setStatus('closed', 'closed')
+      scheduleReconnect('close')
+    }
+
+    socket.onerror = function () {
+      setStatus('error', 'error')
+      scheduleReconnect('error')
+    }
+
+    socket.onmessage = function (event) {
+      lastPacketAt = now()
+
+      let data
+      try {
+        data = JSON.parse(event.data)
+      } catch (e) {
+        return
+      }
+
+      if (!data || data.type !== 'pets_update') return
+      handlePetsUpdate(data)
+    }
+  }
+
+  // ===== DATA PIPELINE =====
+  function normalizePets(rawPets) {
+    if (!Array.isArray(rawPets)) return { pets: [], truncated: 0 }
+    const out = []
+    const limit = Math.min(rawPets.length, MAX_PETS_STORED)
+    for (let i = 0; i < limit; i++) {
+      const s = safeString(rawPets[i], 240)
+      if (s) out.push(s)
+    }
+    const truncated = rawPets.length > MAX_PETS_STORED ? rawPets.length - MAX_PETS_STORED : 0
+    return { pets: out, truncated }
+  }
+
+  function handlePetsUpdate(msg) {
+    const receivedAt = now()
+
+    const player = safeString(msg.player || 'Unknown', 80) || 'Unknown'
+    const jobId = safeString(msg.jobId || 'unknown', 120) || 'unknown'
+    const placeId = safeInt(msg.placeId, 0)
+    const ts = normalizeTs(msg.ts)
+    const key = jobId + '|' + player
+
+    const existing = recordsByKey.get(key)
+    const pinned = existing ? !!existing.pinned : pinnedKeys.has(key)
+    const seq = existing ? existing.seq : (++nextSeq)
+
+    const normalizedPets = normalizePets(msg.pets)
+
+    const rec = {
+      key,
+      player,
+      jobId,
+      placeId,
+      pets: normalizedPets.pets,
+      petsTruncated: normalizedPets.truncated,
+      pinned,
+      ts,
+      lastSeenAt: receivedAt,
+      seq,
+      searchText: buildSearchText(player, placeId, jobId, normalizedPets.pets)
+    }
+
+    recordsByKey.set(key, rec)
+
+    if (frozenRankByKey && !frozenRankByKey.has(key)) {
+      frozenRankByKey.set(key, -(++frozenNewSeq)) // new sessions appear on top while frozen
+    }
+
+    enforceRecordCap()
+
+    if (currentDetailsKey === key) detailsDirty = true
+
+    scheduleRender()
+  }
+
+  // ===== RENDER =====
+  function createBadge(text, cls) {
+    const span = document.createElement('span')
+    span.className = 'badge' + (cls ? ' ' + cls : '')
+    span.textContent = text
+    return span
+  }
+
+  function createButton(label, action, key) {
+    const btn = document.createElement('button')
+    btn.className = 'btn btn-xs secondary'
+    btn.type = 'button'
+    btn.textContent = label
+    btn.dataset.action = action
+    btn.dataset.key = key
+    return btn
+  }
+
+  function recordMatchesFilters(rec, filters) {
+    if (filters.pinnedOnly && !rec.pinned) return false
+    if (rec.pets.length < filters.minLines) return false
+    if (filters.placeFilter && String(rec.placeId) !== filters.placeFilter) return false
+    if (filters.q && rec.searchText.indexOf(filters.q) === -1) return false
+    return true
+  }
+
+  function getPrevRank(prevRank, rec) {
+    const v = prevRank.get(rec.key)
+    return (v === undefined) ? rec.seq : v
+  }
+
+  function renderTable() {
+    const filters = {
+      q: (searchInput.value || '').trim().toLowerCase(),
+      placeFilter: (filterPlaceInput.value || '').trim(),
+      minLines: safeInt(minLinesInput.value, 0) || 0,
+      pinnedOnly: !!pinnedOnlyInput.checked
+    }
+
+    const arr = Array.from(recordsByKey.values())
+
+    if (frozenRankByKey) {
+      arr.sort((a, b) => {
+        const ra = frozenRankByKey.get(a.key)
+        const rb = frozenRankByKey.get(b.key)
+        const va = (ra === undefined) ? 1e12 : ra
+        const vb = (rb === undefined) ? 1e12 : rb
+        if (va !== vb) return va - vb
+        return (a.seq || 0) - (b.seq || 0)
+      })
+    } else {
+      const prevRank = sortRankByKey
+
+      arr.sort((a, b) => {
+        const pinDelta = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)
+        if (pinDelta !== 0) return pinDelta
+        const t = (b.lastSeenAt || b.ts || 0) - (a.lastSeenAt || a.ts || 0)
+        if (t !== 0) return t
+        return getPrevRank(prevRank, a) - getPrevRank(prevRank, b)
+      })
+
+      const nextRank = new Map()
+      for (let i = 0; i < arr.length; i++) nextRank.set(arr[i].key, i)
+      sortRankByKey = nextRank
+    }
+
+    const frag = document.createDocumentFragment()
+    const seenPlayers = new Set()
+    const seenPlaces = new Set()
+    let visible = 0
+
+    for (let i = 0; i < arr.length; i++) {
+      const rec = arr[i]
+      if (!recordMatchesFilters(rec, filters)) continue
+
+      visible += 1
+      seenPlayers.add(rec.player)
+      seenPlaces.add(String(rec.placeId))
+
+      const tr = document.createElement('tr')
+      tr.dataset.key = rec.key
+      if (currentDetailsKey === rec.key) tr.classList.add('selected')
+
+      // Player
+      const tdPlayer = document.createElement('td')
+      const strong = document.createElement('strong')
+      strong.textContent = rec.player
+      tdPlayer.appendChild(strong)
+      if (rec.pinned) {
+        tdPlayer.appendChild(document.createTextNode(' '))
+        tdPlayer.appendChild(createBadge('PINNED', 'yellow'))
+      }
+      tr.appendChild(tdPlayer)
+
+      // Place / Job
+      const tdJob = document.createElement('td')
+      tdJob.appendChild(document.createTextNode('Place: '))
+      const codePlace = document.createElement('code')
+      codePlace.textContent = String(rec.placeId)
+      tdJob.appendChild(codePlace)
+      tdJob.appendChild(document.createElement('br'))
+      tdJob.appendChild(document.createTextNode('Job: '))
+      const codeJob = document.createElement('code')
+      codeJob.textContent = rec.jobId
+      tdJob.appendChild(codeJob)
+      tr.appendChild(tdJob)
+
+      // Lines
+      const tdLines = document.createElement('td')
+      tdLines.appendChild(createBadge(String(rec.pets.length), 'purple'))
+      tr.appendChild(tdLines)
+
+      // Age (relative)
+      const tdAge = document.createElement('td')
+      const age = document.createElement('small')
+      age.textContent = formatRelative(rec.lastSeenAt || rec.ts)
+      tdAge.appendChild(age)
+      tr.appendChild(tdAge)
+
+      // Last seen (clock time)
+      const tdSeen = document.createElement('td')
+      const seen = document.createElement('small')
+      const seenTs = rec.lastSeenAt || rec.ts
+      seen.textContent = formatClock(seenTs)
+      if (seenTs) seen.title = new Date(seenTs).toLocaleString()
+      tdSeen.appendChild(seen)
+      tr.appendChild(tdSeen)
+
+      // Tags
+      const tdTags = document.createElement('td')
+      if (rec.pets.length === 0) tdTags.appendChild(createBadge('empty', 'gray'))
+      else if (rec.pets.length > 100) tdTags.appendChild(createBadge('HUGE', 'yellow'))
+      else tdTags.appendChild(createBadge('OK', 'green'))
+      tr.appendChild(tdTags)
+
+      // Actions
+      const tdActions = document.createElement('td')
+      tdActions.appendChild(createButton('View', 'view', rec.key))
+      tdActions.appendChild(createButton('Copy TP', 'copy_tp', rec.key))
+      tdActions.appendChild(createButton('Copy text', 'copy_text', rec.key))
+      tdActions.appendChild(createButton('Copy JSON', 'copy_json', rec.key))
+      tdActions.appendChild(createButton(rec.pinned ? 'Unpin' : 'Pin', 'toggle_pin', rec.key))
+      tr.appendChild(tdActions)
+
+      frag.appendChild(tr)
+    }
+
+    tableBody.replaceChildren(frag)
+
+    // Stats
+    statsSessions.textContent = recordsByKey.size + ' sessions'
+    statsPlayers.textContent = seenPlayers.size + ' players'
+    statsPlaces.textContent = seenPlaces.size + ' places'
+    statsVisible.textContent = visible + ' visible'
+    statsLastPacket.textContent = 'last packet: ' + (lastPacketAt ? new Date(lastPacketAt).toLocaleTimeString() : '—')
+    lastRenderAt = now()
+    statsLastUpdate.textContent = 'last render: ' + new Date(lastRenderAt).toLocaleTimeString()
+  }
+
+  function showDetails(key) {
+    const rec = recordsByKey.get(key)
+    if (!rec) return
+    currentDetailsKey = key
+    persistSelectedKeySoon()
+
+    const seenTimeStr = new Date(rec.lastSeenAt || rec.ts).toLocaleString()
+    let meta = rec.player +
+      ' • placeId=' + rec.placeId +
+      ' • jobId=' + rec.jobId +
+      ' • lines=' + rec.pets.length +
+      ' • lastSeen=' + seenTimeStr
+
+    if (rec.petsTruncated) meta += ' • truncated=' + rec.petsTruncated
+
+    detailsMeta.textContent = meta
+    detailsBox.textContent = rec.pets.join('\n') + (rec.petsTruncated ? '\n\n---\nTRUNCATED: +' + rec.petsTruncated + ' more lines not stored' : '')
+    detailsBox.style.display = 'block'
+    detailsHint.style.display = 'none'
+
+    // Jump to selected row (b)
+    window.requestAnimationFrame(() => scrollRowIntoView(key, true))
+    scheduleRender()
+  }
+
+  function clearAll() {
+    recordsByKey.clear()
+    sortRankByKey = new Map()
+    nextSeq = 0
+    if (frozenRankByKey) frozenRankByKey.clear()
+    disableFreezeOrder()
+    clearDetails()
+    scheduleRender()
+  }
+
+  // ===== EVENTS =====
+  // Copy buttons (snippets) - event delegation
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('button[data-copy]')
+    if (!btn) return
+    const id = btn.getAttribute('data-copy')
+    const el = document.getElementById(id)
+    if (!el) return
+    const ok = await copyToClipboard(el.textContent || '')
+    flashButton(btn, ok)
+    if (ok) showToast('Copied to clipboard')
+  })
+
+  // Table actions - event delegation
+  tableBody.addEventListener('click', async function (e) {
+    const btn = e.target.closest('button[data-action]')
+    if (!btn) return
+    const key = btn.dataset.key
+    const action = btn.dataset.action
+    const rec = recordsByKey.get(key)
+    if (!rec) return
+
+    if (action === 'view') {
+      showDetails(key)
+      return
+    }
+
+    if (action === 'toggle_pin') {
+      rec.pinned = !rec.pinned
+      if (rec.pinned) pinnedKeys.add(rec.key)
+      else pinnedKeys.delete(rec.key)
+      persistPinnedKeys()
+      recordsByKey.set(rec.key, rec)
+      scheduleRender()
+      return
+    }
+
+    if (action === 'copy_tp') {
+      const snippet = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' +
+        rec.placeId + ', "' + rec.jobId + '", game.Players.LocalPlayer)'
+      const ok = await copyToClipboard(snippet)
+      flashButton(btn, ok)
+      if (ok) showToast('Teleport snippet copied')
+      return
+    }
+
+    if (action === 'copy_text') {
+      const txt = rec.pets.join('\n') + (rec.petsTruncated ? '\n\n---\nTRUNCATED: +' + rec.petsTruncated : '')
+      const ok = await copyToClipboard(txt)
+      flashButton(btn, ok)
+      if (ok) showToast('Text copied')
+      return
+    }
+
+    if (action === 'copy_json') {
+      const payload = JSON.stringify({
+        type: 'pets_update',
+        player: rec.player,
+        placeId: rec.placeId,
+        jobId: rec.jobId,
+        pets: rec.pets,
+        ts: rec.ts,
+        lastSeenAt: rec.lastSeenAt,
+        truncated: rec.petsTruncated || 0
+      }, null, 2)
+      const ok = await copyToClipboard(payload)
+      flashButton(btn, ok)
+      if (ok) showToast('JSON copied')
+    }
+  })
+
+  btnReconnect.addEventListener('click', function () {
+    btnReconnect.disabled = true
+    window.setTimeout(() => { btnReconnect.disabled = false }, 700)
+    connectWs({ manual: true, reason: 'manual_click' })
+  })
+
+  btnClear.addEventListener('click', clearAll)
+
+  searchInput.addEventListener('input', function () { scheduleRender() })
+  filterPlaceInput.addEventListener('input', function () { persistUiStateSoon(); scheduleRender() })
+  minLinesInput.addEventListener('input', function () { persistUiStateSoon(); scheduleRender() })
+  pinnedOnlyInput.addEventListener('change', function () { persistUiStateSoon(); scheduleRender() })
+
+  freezeOrderInput.addEventListener('change', function () {
+    if (freezeOrderInput.checked) enableFreezeOrder()
+    else disableFreezeOrder()
+    persistUiStateSoon(true)
+    scheduleRender()
+  })
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && (!socket || socket.readyState === WebSocket.CLOSED)) {
+      connectWs({ manual: false, reason: 'visibility' })
+    }
+  })
+
+  // ===== START =====
+  loadUiState()
+  if (freezeOrderInput.checked) enableFreezeOrder()
+
+  setStatus('connecting', 'connecting…')
+  connectWs({ manual: false, reason: 'boot' })
+
+  // Restore selected details after first render when data arrives
+  if (currentDetailsKey) detailsDirty = true
+  scheduleRender()
+</script>
+</body>
+</html>
